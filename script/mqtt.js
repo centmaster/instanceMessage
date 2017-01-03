@@ -72,14 +72,14 @@
 			if (res.type == 202) {
 				var message = "用户：" + res.from + "已经同意加入您的群" + res.groupname;
 				alert(message);
-				Ctrtc.Device.Udeleteajg(res.frome,res.groupid);
+				Ctrtc.Device.Udeleteajg(res.frome, res.groupid);
 				Mqtt.Device.Usubscribegroup(res.groupid);
 			}
 			//203拒绝加入群
 			if (res.type == 203) {
 				var message = "用户：" + res.from + "拒绝加入您的群" + res.groupname;
 				alert(message);
-				Ctrtc.Device.Udeleterjg(res.from,res.groupid);
+				Ctrtc.Device.Udeleterjg(res.from, res.groupid);
 			}
 			//204是否同意申请入群
 			if (res.type == 204) {
@@ -89,10 +89,10 @@
 				var deter = confirm(message);
 				if (deter) {
 					Ctrtc.Device.Uaccepttogroup(reqname, groupid);
-					Ctrtc.Device.Udeleteatg(reqname,groupid);
+					Ctrtc.Device.Udeleteatg(reqname, groupid);
 				} else {
 					Ctrtc.Device.Urefusetogroup(reqname, groupid);
-					Ctrtc.Device.Udeletertg(reqname,groupid);
+					Ctrtc.Device.Udeletertg(reqname, groupid);
 				}
 			}
 			//205通过申请入群
@@ -105,20 +105,20 @@
 				alert("群主拒绝了你的入群要求，并附言" + res.rsptext);
 			}
 			//207退出群组
-			if(res.type ==207){
-				console.log("您已退出群聊:"+res.groupname+res.reqtext);
+			if (res.type == 207) {
+				console.log("您已退出群聊:" + res.groupname + res.reqtext);
 				Ctrtc.Device.Udeleteqg()
 			}
 			//209当有新的成员加入群时所有群成员收到
 			if (res.type == 209) {
-				var groupid=res.groupid;
+				var groupid = res.groupid;
 				console.log("新的成员:" + res.to + "加入群:" + groupid);
 				Ctrtc.Device.Udeletenewin(groupid);
 			}
 			//210退出群
 			if (res.type == 210) {
-				var groupid=res.groupid;
-				console.log("成员:"+res.to+"退出了群:"+res.groupname);
+				var groupid = res.groupid;
+				console.log("成员:" + res.to + "退出了群:" + res.groupname);
 				Ctrtc.Device.Udeletequit(groupid);
 			}
 			//211群被删除
@@ -136,25 +136,66 @@
 			//type：1 收到群组或好友发送的消息
 			//console.log("["+res.timestamp+"]"+res.from+" : " +res.bodies[0].msg)；
 			//receive message
-			if(res.type==1) {
-				console.log(res.from+" : " +res.bodies[0].msg);
-				var date=new Date();
-				if(res.chattype==0){
-					$('#fgid').text(res.from);
-				}else if(res.chattype==1){
-					var groupname;
-					$('.isgroup').each(function(){
-						if($(this).attr("value") == res.to){
-							$('#fgid').text($(this).text());
-						}
-						
-					})
+			if (res.type == 1) {
+				//console.log(res.from+" : " +res.bodies[0].msg);
+				if (!(res.from == Mqtt.from && res.to == Mqtt.to)) {
+					$('#panelpad').text("");
 				}
-				if(res.from!=Ctrtc.Device.Ugetinfo()){
-					$('#panelpad').append('['+date.toLocaleString()+']'+'&nbsp;&nbsp; user'+res.from+':'+decodeURI(res.bodies[0].msg)+"<br>");
+				$('#fgid').text("" + res.from + "");
+
+
+				if (res.bodies[0].msgtype == "txt") {
+					var date = new Date();
+					if (res.chattype == 0) {
+						$('#fgid').text(res.from);
+					} else if (res.chattype == 1) {
+						var groupname;
+						$('.isgroup').each(function() {
+							if ($(this).attr("value") == res.to) {
+								$('#fgid').text($(this).text());
+							}
+
+						})
+					}
+					if (res.from != Ctrtc.Device.Ugetinfo()) {
+						$('#panelpad').append('[' + date.toLocaleString() + ']' + '&nbsp;&nbsp; user' + res.from + ':' + decodeURI(res.bodies[0].msg) + "<br>");
+					}
+
+				} else if (res.bodies[0].msgtype == "audio") {
+					var date = new Date();
+					$('#panelpad').append('<audio src="'+res.bodies[0].url+'"></audio>' + "<br>");
+
+				} else if (res.bodies[0].msgtype == "img") {
+					$('#panelpad').append('<img style="height:150px;width:80px;" src="' + res.bodies[0].url + '"/>' + "<br>")
+				} else if (res.bodies[0].msgtype == "file") {
+					$('#panelpad').append('<a href="' + res.bodies[0].url + '"target="_parent">download</a>');
+				} else if (res.bodies[0].msgtype == "video") {
+					$('#panelpad').append('<video src="' + res.bodies[0].url + '" autoplay width="200px"height="150px"></video>' + "<br>")
+				} else if (res.bodies[0].msgtype == "loc") {
+					//确定城市
+					var city = res.bodies[0].addr.indexOf('市')
+					var addr = res.bodies[0].addr.substring(2, city);
+
+					$('#allmap').css({
+						"display": "block"
+					});
+					var lat = res.bodies[0].lat;
+					var lng = res.bodies[0].lng;
+					// 百度地图API功能
+					var map = new BMap.Map("allmap"); // 创建Map实例
+					map.centerAndZoom(new BMap.Point(lng, lat), 16); // 初始化地图,设置中心点坐标和地图级别
+					var point = new BMap.Point(lng,lat);
+					var marker = new BMap.Marker(point); // 创建标注
+					map.addOverlay(marker);
+					map.addControl(new BMap.MapTypeControl()); //添加地图类型控件
+					map.setCurrentCity(addr); // 设置地图显示的城市 此项是必须设置的
+					map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
 				}
-				
-				Ctrtc.Device.Uconfirmrm(res.from,res.to,res.chattype,res.timestamp);
+
+				Mqtt.from = res.from;
+				Mqtt.to = res.to;
+
+				Ctrtc.Device.Uconfirmrm(res.from, res.to, res.chattype, res.timestamp);
 			}
 
 			//var time = '[' + (new Date()).format("yyyy-MM-dd hh:mm:ss") + '] :';
@@ -164,14 +205,14 @@
 		var client = null;
 
 		function connect(username) {
-			client_id=username;//+'~123~Browser';
+			client_id = username; //+'~123~Browser';
 			client = new Paho.MQTT.Client(host, port, path, client_id);
 			//alert(client_id);
 			client.onConnectionLost = onConnectionLost;
 			client.onMessageArrived = onMessageArrived;
 
 			var options = {
-				cleanSession:false,
+				cleanSession: false,
 				onSuccess: function() {
 					console.log("The client connect success");
 				}
@@ -191,7 +232,7 @@
 			console.log("you've subscribe the topic " + topic);
 		}
 
-		function unsubscribe(){
+		function unsubscribe() {
 			client.unsubscribe();
 			console.log("success unsubscribe");
 		}
@@ -219,11 +260,11 @@
 				return infoStore.friendreq;
 			},
 
-			Usubscribegroup: function(groupid){
-				var topic='/123/groups/'+groupid+'/inbox';
+			Usubscribegroup: function(groupid) {
+				var topic = '/123/groups/' + groupid + '/inbox';
 				subscribe(topic);
 			},
-			Uunsubscribe: function(){
+			Uunsubscribe: function() {
 				unsubscribe();
 			}
 
