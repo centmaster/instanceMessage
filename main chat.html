@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CTRTC CHAT BY BOOTSTRAP</title>
+    <link href="bootstrap.css" rel="stylesheet" type="text/css">
+
+       <!-- 引用encode库 -->
+    <script src="rollups/tripledes.js"></script>
+    <script src="rollups/aes.js"></script>
+    <script src="rollups/md5.js"></script>
+    <script src="rollups/hmac-sha1.js"></script>
+    <script src="components/enc-base64.js"></script> 
+    <script src="components/mode-ecb.js"></script>
+
+  <script src="script/jquery-1.7.2.min.js" type="text/javascript"></script>
+  <script src="script/jquery-ui-1.8.21.min.js" type="text/javascript"></script>
+  <script src="script/jquery-1.6.1.min.js" type="text/javascript"></script>
+  <script src="http://cdn.bootcss.com/jquery/3.0.0/jquery.min.js"></script>
+  <link href="http://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+
+  <script src="script/demohttp.js" type="text/javascript"></script>
+  <script src="script/screen.js" type="text/javascript"></script>
+    <script src="script/restapi.js" type="text/javascript"></script><!-- 引用jssdk rtc.js -->
+    <script src="script/getStats.js" type="text/javascript"></script><!-- 引用jssdk rtc.js -->
+    <script src="script/emqttd.js" type="text/javascript"></script>
+    <script src="script/mqttws31.js" type="text/javascript"></script>
+    <script src="script/mqtt.js" type="text/javascript"></script>
+
+    
+
+
+<!-- 新 Bootstrap 核心 CSS 文件 -->
+<link href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+ 
+<!-- 可选的Bootstrap主题文件（一般不使用） -->
+<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap-theme.min.css"></script>
+ 
+<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+ 
+<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="script/jquery.cookie.js" type="text/javascript"></script>
+<script src="script/demo.js" type="text/javascript"></script>
+
+</head>
+<body>
+
+
+<div class="main">
+	<div class="inner">
+        <div class="left">
+	       <div class="row">
+	           <nav class="navbar navbar-default" role="navigation">
+               <div class="container-fluid">
+               
+               <div class="navbar-header">  
+               <a class="navbar-brand bg-success" href="#"  data-toggle="modal" data-target="#myModaluserinfo"  id="showusername" >Centmaster</a>
+                <button class="btn btn-primary col-sm-3" style="margin-top: 3%;" data-toggle="modal" data-target="#myModalchangeinfo">修改个人信息</button>
+                <button class="btn btn-primary col-sm-3" style="margin-top:3%;" onclick="logout()">退出登录</button>
+                
+                <div>
+                <ul class="nav navbar-nav three">
+                    <li class="active" id="btn-friend" onclick="friendclick()"><a href="#customfriend" >Friend</a></li>
+                    <li id="btn-group" onclick="groupclick()"><a href="#customgroup" >Group</a></li>
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"> More</a>
+                    
+                        <ul class="dropdown-menu">
+                            <li><a href="#" id="btn-addfriend" data-toggle="modal" data-target="#myModaladdfriend">add friend</a></li>
+                            <li><a href="#" id="btn-searchgroup" data-toggle="modal" data-target="#myModalsearchgroup">search group</a></li>
+                            <li><a href="#" id="btn-addgroup" data-toggle="modal" data-target="#myModaladdgroup">add group</a></li>
+                            <li><a href="#" id="btn-creategroup" data-toggle="modal" data-target="#myModalcreategroup">create group</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                </div>
+            </div>
+        </nav>
+
+
+
+
+			     <!-- 登录注册模态框（Modal） -->
+		
+	           <div id="signin-signup-tab" class="modal fade">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+          <div class="modal-body">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">x</button>
+            <ul class="nav nav-tabs" role="tablist">
+              <li id="signin-li" class="active"><a href="#signin-tab" role="tab" data-toggle="tab" ">登陆</a></li>
+              <li id="signup-li"><a href="#signup-tab" role="tab" data-toggle="tab">注册</a></li>
+            </ul>
+
+            <div class="tab-content" id="signin-signup-tab">
+              	<div class="tab-pane fade in" id="signup-tab">
+                <a class="form center-block">
+                  <div class="form-group">
+                    <input type="text" id="username1" class="form-control input-lg" placeholder="请输入登陆用户名" title="邮箱正确格式：xxx@xxx.com">
+                  </div>
+                  <div class="form-group">
+                    <input id="password1" type="password" class="form-control input-lg" placeholder="请输入登陆密码">
+                  </div>
+                  <div class="form-group">
+                    <input id="password2" type="password" class="form-control input-lg" placeholder="请再次输入密码">
+                  </div>
+                  <div class="form-group">
+                    <button class="btn btn-primary btn-lg btn-block" id="signup">注册</button>
+                  </div>
+                </a>
+              </div>
+              <div class="tab-pane fade in active" id="signin-tab">
+                
+				<a class="form center-block">
+                  <div class="form-group">
+                    <input type="text" id="username" class="form-control input-lg " placeholder="请输入登陆用户名">
+                  </div>
+                  <div class="form-group">
+                    <input type="password" id="password" class="form-control input-lg" placeholder="请输入登录密码">
+                  </div>
+                  <div class="form-group">
+                   <div class="checkbox">
+        		<label>
+         		 <input type="checkbox" id="rmbme">请记住我
+       			 </label>
+    			  </div>
+                    <button class="btn btn-primary btn-lg btn-block" id="signin">立刻登录</button>
+                    <span><a href="newforgot.html">忘记密码</a></span>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+			<!-- 模态框（Modal） -->
+		
+<div class="modal fade" id="myModaladdfriend" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">添加好友请求</h4>
+            </div>
+            	<div class="form-group">
+                    <input id="friendid" type="text" class="form-control input-lg" placeholder="请输入好友id">
+                  </div>
+                  <div class="form-group">
+                    <input id="reqreason" type="text" class="form-control input-lg" placeholder="请输入添加原因">
+                  </div> 
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary " id="submit-addfriend" onclick="reqfriend()">提交</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
+
+
+<div class="modal fade" id="myModaladdgroup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">添加群组请求</h4>
+            </div>
+            <div class="form-group">
+                    <input id="addgroupid" type="text" class="form-control input-lg" placeholder="请输入群组id">
+                  </div>
+                  <div class="form-group">
+                    <input id="addgroupreason" type="text" class="form-control input-lg" placeholder="请输入添加原因">
+                  </div>  
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary " id="submit-addgroup" onclick="addgroup()" >提交</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
+
+<div class="modal fade" id="myModalcreategroup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<center>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">创建群组请求</h4>
+            </div>
+            <div class="form-group">
+                    <input id="newgroup" type="text" class="form-control input-lg" placeholder="请输入群组名称">
+                  </div>
+                  <div  style="height: 200px;overflow: auto; width: 100%;">
+					<p class="text-left text-muted">选择好友</p>
+					<div class="row" id="selectfriend">
+    			  </div>
+    			</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="submit-creategroup">提交</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+    </center>
+</div>
+
+
+
+
+<div class="modal fade" id="myModalsearchgroup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">搜索群组</h4>
+            </div>
+            <div class="form-group">
+                    <input id="searchgroup" type="text" class="form-control input-lg" placeholder="请输入群组名称">
+                  </div>
+                   
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary " id="submit-searchgroup" >提交</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<!--个人信息模态框（Modal） -->
+<div class="modal fade" id="myModaluserinfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    用户信息
+                </h4>
+            </div>
+            <div class="modal-body" id="userinfo" >
+                
+            </div>
+            
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
+
+
+
+<!-- 更改个人信息模态框（Modal） -->
+        <div class="modal fade" id="myModalchangeinfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title">
+                    修改用户信息
+                </h4>
+            </div>
+            <div class="modal-body" >
+                    <div class="form-group">
+                    <input type="text" id="changeemail" class="form-control input-lg" placeholder="请输入邮箱" title="邮箱正确格式：xxx@xxx.com">
+                  </div>
+                  <div class="form-group">
+                    <input id="changepassword" type="password" class="form-control input-lg" placeholder="请输入密码">
+                  </div>
+                  <div class="form-group">
+                    <input id="changenickname" type="text" class="form-control input-lg" placeholder="请输入昵称">
+                  </div>
+                  <div class="form-group">
+                    <button class="btn btn-primary btn-lg btn-block" id="changeuserinfo" onclick="changeinfo()">申请修改个人信息</button>
+                  </div>
+            </div>
+            
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+     
+
+
+<!-- 修改群组名称模态框（Modal） -->
+<div class="modal fade" id="myModalchangegroupinfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">修改群组名称</h4>
+            </div>
+            <div class="form-group">
+                    <input id="changegroupname" type="text" class="form-control input-lg" placeholder="请输入想要的群组名称">
+                  </div>
+                   
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary " id="submit-changegroupinfo" >提交</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
+
+
+<!-- 邀请好友入群模态框（Modal） -->
+<div class="modal fade" id="myModalinvitetogroup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<center>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">邀请好友入群请求</h4>
+            </div>
+                  <div  style="height: 200px;overflow: auto; width: 100%;">
+                    <p class="text-left text-muted">选择好友</p>
+                    <div class="row" id="selectfriend2">
+                  </div>
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="submit-invitetogroup">提交</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+    </center>
+</div>
+
+
+
+
+
+<!-- 踢群模态框（Modal） -->
+<div class="modal fade" id="myModalkickfromgroup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<center>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">踢出群请求</h4>
+            </div>
+                  <div  style="height: 200px;overflow: auto; width: 100%;">
+                    <p class="text-left text-muted">选择好友</p>
+                    <div class="row" id="selectfriend3">
+                  </div>
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="submit-kickfromgroup">提交</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+    </center>
+</div>
+
+
+
+<!--联系人 -->
+	<div class="contact" >
+
+		<div class="list-group active" id="customfriend" style="height: 450px;overflow: auto;display: block;">
+    
+
+</div>
+
+<div class="list-group" id="customgroup" style="height: 450px; overflow: auto; display: none;">
+    <li href="#" class="list-group-item isgroup">
+        <h4 class="list-group-item-heading ">
+            group1
+        </h4>
+    </li>
+    <a href="#" class="list-group-item">
+        <h4 class="list-group-item-heading">
+            group2
+        </h4>
+    </a>
+    <a href="#" class="list-group-item">
+        <h4 class="list-group-item-heading">
+            group3
+        </h4>
+    </a>
+</div>
+</div>
+</div>
+</div>
+
+	<div class="chat">
+		<div class="panel panel-primary " id="chatshow">
+    		<div class="panel-heading">
+    		<div class="dropdown">
+       		  <p class="dropdown-toggle text-center "  data-toggle="dropdown" id="fgid" value=0>Chenyitian</p>
+       	 <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu1" >
+        <li role="presentation">
+            <a role="menuitem" tabindex="-1" href="#" id="delete"></a>
+        </li>
+        <li role="presentation">
+            <a role="menuitem" tabindex="-1" href="#" id="detailinfo" onclick="groupinfo()"></a>
+        </li>
+        <li role="presentation">
+            <a role="menuitem" tabindex="-1" href="#" id="deletegroup" onclick="deletegroup()"></a>
+        </li>
+        <li role="presentation">
+            <a role="menuitem" tabindex="-1" href="#" id="changegroupinfo" data-toggle="modal" data-target="#myModalchangegroupinfo"></a>
+        </li>
+        <li role="presentation">
+            <a role="menuitem" tabindex="-1" href="#" id="invitetogroup" data-toggle="modal" data-target="#myModalinvitetogroup"></a>
+        </li>
+        <li role="presentation">
+            <a role="menuitem" tabindex="-1" href="#" id="kickfromgroup" data-toggle="modal" data-target="#myModalkickfromgroup"></a>
+        </li>
+    </ul>
+ </div>
+</div>
+    		<div class="panel-body"  style="height: 80%;">
+                <p id="panelpad"  style="overflow:auto; height: 80%;">
+                </p>
+    			</div>
+			</div>
+
+
+
+      <form class="bs-example bs-example-form" role="form">
+            <div class="col-lg-14">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="messagepad">
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" type="button" onclick="sendmessage()">Send</button>
+                    </span>
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-6 -->
+        </div><!-- /.row -->
+    </form>
+    </div>
+</div>
+
+
+	<script type="text/javascript">
+
+	</script>
+
+</body>
+</html>
