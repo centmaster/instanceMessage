@@ -137,6 +137,7 @@
 			//console.log("["+res.timestamp+"]"+res.from+" : " +res.bodies[0].msg)；
 			//receive message
 			if (res.type == 1) {
+				var date = new Date();
 				//console.log(res.from+" : " +res.bodies[0].msg);
 				if (!(res.from == Mqtt.from && res.to == Mqtt.to)) {
 					$('#panelpad').text("");
@@ -158,27 +159,27 @@
 						})
 					}
 					if (res.from != Ctrtc.Device.Ugetinfo()) {
-						$('#panelpad').append('[' + date.toLocaleString() + ']' + '&nbsp;&nbsp; user' + res.from + ':' + decodeURI(res.bodies[0].msg) + "<br>");
+						$('#panelpad').append('[' + date.toLocaleString() + ']' + '&nbsp;&nbsp; user~' + res.from + ':' + decodeURI(res.bodies[0].msg) + "<br>");
 					}
 
 				} else if (res.bodies[0].msgtype == "audio") {
-					var date = new Date();
+					
 					$('#panelpad').append('<audio src="'+res.bodies[0].url+'"></audio>' + "<br>");
 
 				} else if (res.bodies[0].msgtype == "img") {
-					$('#panelpad').append('<img style="height:150px;width:80px;" src="' + res.bodies[0].url + '"/>' + "<br>")
+					
+					$('#panelpad').append('[' + date.toLocaleString() + ']' + '&nbsp;&nbsp; user~' + res.from + ':' +'<img style="height:68px;width:140px; vertical-align:top" src="' + res.bodies[0].url + '" onclick="showMask()"/>' + "<br><br><br>");
+					$('#picmask').append('<img style=" display:none "  id="picshow" src="' + res.bodies[0].url + '"/>');
 				} else if (res.bodies[0].msgtype == "file") {
-					$('#panelpad').append('<a href="' + res.bodies[0].url + '"target="_parent">download</a>');
+					$('#panelpad').append('[' + date.toLocaleString() + ']' + '&nbsp;&nbsp; user~' + res.from + ':' +'<a href="'+res.bodies[0].url+'" target="_blank">收到新的文件点我下载</a><br><br><br>');
 				} else if (res.bodies[0].msgtype == "video") {
-					$('#panelpad').append('<video src="' + res.bodies[0].url + '" autoplay width="200px"height="150px"></video>' + "<br>")
+					$('#panelpad').append('[' + date.toLocaleString() + ']' + '&nbsp;&nbsp; user~' + res.from + ':' +'<video src="' + res.bodies[0].url + '"controls="controls" style="vertical-align:top" width="200" height="180">您的浏览器版本过低</video>' + "<br><br><br>")
 				} else if (res.bodies[0].msgtype == "loc") {
 					//确定城市
 					var city = res.bodies[0].addr.indexOf('市')
 					var addr = res.bodies[0].addr.substring(2, city);
 
-					$('#allmap').css({
-						"display": "block"
-					});
+					$('#panelpad').append('[' + date.toLocaleString() + ']' + '&nbsp;&nbsp; user~' + res.from + ':' +'<p class=".text-muted">'+res.bodies[0].addr+'</p>'+'<br>'+'<div id="allmap" style="height:300px;width:550px"></div>'+ "<br><br><br>");
 					var lat = res.bodies[0].lat;
 					var lng = res.bodies[0].lng;
 					// 百度地图API功能

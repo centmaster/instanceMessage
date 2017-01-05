@@ -166,6 +166,23 @@
 	}
 
 
+	function showMask(){
+
+		$(".mask1").css("height",$(document).height());     
+        $(".mask1").css("width",$(document).width());     
+        $(".mask1").show();
+        $('#picshow').show();
+	}
+
+	function hideMask(){
+		$('.mask1').hide();
+	}
+
+	function receivetxt(URL){
+		window.href="www.baidu.com";
+	}
+
+
 
 	$(document).ready(function() {
 
